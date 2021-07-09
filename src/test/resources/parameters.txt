@@ -1,0 +1,4 @@
+-X POST -H 'Content-Type: text/xml' \
+    -H 'SOAPAction: blz:getBank' \
+    'http://www.thomas-bayer.com/axis2/services/BLZService' \
+    -d @src/test/resources/request.xml
