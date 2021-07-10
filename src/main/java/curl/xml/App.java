@@ -1,5 +1,8 @@
 package curl.xml;
 
+import net.sf.saxon.lib.Feature;
+import net.sf.saxon.lib.FeatureKeys;
+import net.sf.saxon.s9api.*;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 
@@ -9,6 +12,13 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import net.sf.saxon.s9api.*;
+import net.sf.saxon.functions.*;
 
 import static org.toilelibre.libe.curl.Curl.curl;
 
@@ -22,7 +32,13 @@ public class App {
             System.out.println("No curl arguments provided. See https://github.com/libetl/curl");
             System.exit(1);
         }
-        String appArgs = String.join(" ", args);
+        boolean doQuote=false;
+        List<String> argList=Arrays.asList(args).stream().map(arg -> {
+            if(arg.matches("^[\"@\\-].*")) return arg;
+            return "\""+arg.replaceAll("\"", "\\\"")+"\"";
+        }).collect(Collectors.toList());
+
+        String appArgs = String.join(" ", argList);
         try {
             final String fileArgMatcher = "-d  *[\"']*@([^\"']*)[\"']*";
             final File input = new File(appArgs.replaceAll(".*"+fileArgMatcher+".*", "$1"));
@@ -42,19 +58,44 @@ public class App {
         }
     }
 
-    public String transform(InputStream xmlIn, InputStream xslIn) throws TransformerException, IOException {
-        try (InputStream xml = xmlIn) {
-            try (InputStream xslt = xslIn) {
-                Source xmlSource = new StreamSource(xml);
+    public String transform(InputStream xmlIn, InputStream xslIn) throws TransformerException, IOException, SaxonApiException {
+        /*try (InputStream xml = xmlIn)*/ {
+            /*try (InputStream xslt = xslIn)*/ {
+                Processor processor = new Processor(false);
+                processor.setConfigurationProperty(net.sf.saxon.lib.Feature.SUPPRESS_XSLT_NAMESPACE_CHECK, false);
+                processor.setConfigurationProperty(net.sf.saxon.lib.Feature.ERROR_LISTENER_CLASS,
+                        NullErrorListener.class.getName());
+//                XsltCompiler comp = processor.newXsltCompiler();
+//                XsltExecutable exp = comp.compile(new StreamSource(xslIn));
+
+                Source xmlSource = new StreamSource(xmlIn);
                 StringWriter sw = new StringWriter();
-                Result out = new StreamResult(sw);
-                TransformerFactory factory = TransformerFactory.newInstance();
-                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
-                Transformer transformer = factory.newTransformer(new StreamSource(xslt));
-                transformer.transform(xmlSource, out);
+                //Result result = new StreamResult(sw);
+
+                XsltCompiler compiler = processor.newXsltCompiler();
+                XsltExecutable stylesheet = compiler.compile(new StreamSource(xslIn));
+                Serializer out = processor.newSerializer(sw);
+
+                //out.setOutputProperty(Serializer.Property.METHOD, "text");
+                //out.setOutputProperty(Serializer.Property.INDENT, "no");
+//                TransformerFactory factory = TransformerFactory.newInstance();
+//                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+//                factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
+//                Transformer transformer = factory.newTransformer(new StreamSource(xslt));
+//                transformer.transform(xmlSource, out);
+                //XsltTransformer trans = exp.load();
+                Xslt30Transformer trans = stylesheet.load30();
+                //trans.setInitialContextNode(source);
+                //trans.setDestination(out);
+                trans.transform(xmlSource, out);
                 return sw.toString();
             }
         }
+    }
+
+    public class NullErrorListener implements ErrorListener {
+        @Override public void warning(TransformerException e) throws TransformerException { }
+        @Override public void error(TransformerException e) throws TransformerException { }
+        @Override public void fatalError(TransformerException e) throws TransformerException { }
     }
 }
