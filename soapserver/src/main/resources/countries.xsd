@@ -9,6 +9,15 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="getCountriesRequest">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="nameList" block="extension"
+                            minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:element name="getCountryResponse">
         <xs:complexType>
             <xs:sequence>
@@ -17,10 +26,19 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:element name="getCountriesResponse">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="countriesList" block="extension" type="tns:country"
+                            minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
     <xs:complexType name="country">
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
-            <xs:element name="population" type="xs:int"/>
+            <xs:element name="population" type="xs:long"/>
             <xs:element name="capital" type="xs:string"/>
             <xs:element name="currency" type="tns:currency"/>
         </xs:sequence>
@@ -30,7 +48,7 @@
         <xs:restriction base="xs:string">
             <xs:enumeration value="GBP"/>
             <xs:enumeration value="EUR"/>
-            <xs:enumeration value="PLN"/>
+            <xs:enumeration value="CHF"/>
         </xs:restriction>
     </xs:simpleType>
 </xs:schema>

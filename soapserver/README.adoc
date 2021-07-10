@@ -298,7 +298,7 @@ curl --header "content-type: text/xml" -d @request.xml http://localhost:8080/ws
 ----
 # Use inline XML data
 curl <<-EOF -fsSL -H "content-type: text/xml" -d @- http://localhost:8080/ws \
-  > target/response.xml && xmllint --format target/response.xml
+  > build/response.xml && xmllint --format target/response.xml
 
 <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
                                   xmlns:gs="http://spring.io/guides/gs-producing-web-service">

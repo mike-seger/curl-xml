@@ -1,5 +1,7 @@
 package com.example.producingwebservice;
 
+import io.spring.guides.gs_producing_web_service.GetCountriesRequest;
+import io.spring.guides.gs_producing_web_service.GetCountriesResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ws.server.endpoint.annotation.Endpoint;
 import org.springframework.ws.server.endpoint.annotation.PayloadRoot;
@@ -25,7 +27,14 @@ public class CountryEndpoint {
 	public GetCountryResponse getCountry(@RequestPayload GetCountryRequest request) {
 		GetCountryResponse response = new GetCountryResponse();
 		response.setCountry(countryRepository.findCountry(request.getName()));
+		return response;
+	}
 
+	@PayloadRoot(namespace = NAMESPACE_URI, localPart = "getCountriesRequest")
+	@ResponsePayload
+	public GetCountriesResponse getCountries(@RequestPayload GetCountriesRequest request) {
+		GetCountriesResponse response = new GetCountriesResponse();
+		response.getCountriesList().addAll(countryRepository.findCountries(request.getNameList()));
 		return response;
 	}
 }
