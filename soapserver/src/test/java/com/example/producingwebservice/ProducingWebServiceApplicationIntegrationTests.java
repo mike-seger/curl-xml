@@ -16,7 +16,7 @@
 
 package com.example.producingwebservice;
 
-import io.spring.guides.gs_producing_web_service.GetCountryRequest;
+import io.spring.guides.gs_producing_web_service.CountryNameList;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -38,15 +38,15 @@ public class ProducingWebServiceApplicationIntegrationTests {
 
 	@BeforeEach
 	public void init() throws Exception {
-		marshaller.setPackagesToScan(ClassUtils.getPackageName(GetCountryRequest.class));
+		marshaller.setPackagesToScan(ClassUtils.getPackageName(CountryNameList.class));
 		marshaller.afterPropertiesSet();
 	}
 
 	@Test
 	public void testSendAndReceive() {
 		WebServiceTemplate ws = new WebServiceTemplate(marshaller);
-		GetCountryRequest request = new GetCountryRequest();
-		request.getNameList().add("Germany");
+		CountryNameList request = new CountryNameList();
+		request.getName().add("Germany");
 
 		assertThat(ws.marshalSendAndReceive("http://localhost:"
 				+ port + "/ws", request) != null);
