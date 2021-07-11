@@ -29,7 +29,7 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-public class ProducingWebServiceApplicationIntegrationTests {
+public class ApplicationIntegrationTests {
 
 	private Jaxb2Marshaller marshaller = new Jaxb2Marshaller();
 
