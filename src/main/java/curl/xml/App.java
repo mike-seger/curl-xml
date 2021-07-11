@@ -50,7 +50,7 @@ public class App {
         String appArgs = String.join(" ", argList);
         try {
             final String fileArgMatcher = "-d  *[\"']*@([^\"']*)[\"']*";
-            String input = appArgs.replaceAll(".*"+fileArgMatcher+".*", "$1");
+            String input = appArgs.replaceAll(".*"+fileArgMatcher+".*", "$1").trim();
             String inputString;
             if(System.in.available()>0) {
                 inputString=readInput(System.in).replace("'", "\\'");
@@ -77,9 +77,12 @@ public class App {
             final String curlArgs = appArgs.replaceAll(fileArgMatcher, "")
                 .replaceAll("$", " -d '"+inputString+"'");
             final HttpResponse response = curl(curlArgs);
+            System.out.println("CURL-ARGS: "+curlArgs);
             final HttpEntity responseEntity = response.getEntity();
             if (responseEntity != null) {
-                String result = transform(responseEntity.getContent(), getClass().getResourceAsStream("/xsl/strip-ns.xsl"));
+                String curlResult = readInput(responseEntity.getContent());
+                System.out.println("CURL-RESULT: "+curlResult);
+                String result = transform(string2InputStream(curlResult), getClass().getResourceAsStream("/xsl/strip-ns.xsl"));
                 for(String xsl : outputTransformations) {
                     result = transform(string2InputStream(result), getResource(xsl));
                     System.out.println(result);
@@ -117,8 +120,15 @@ public class App {
     }
 
     public String transform(InputStream xmlIn, InputStream xslIn, Map<String, String> params) throws IOException, SaxonApiException {
-        try (InputStream xml = xmlIn) {
-            try (InputStream xslt = xslIn) {
+//        try (InputStream xml = xmlIn) {
+//            try (InputStream xslt = xslIn) {
+        String xmlString=readInput(xmlIn);
+        String xsltString=readInput(xmlIn);
+        System.out.println("XML: "+xmlString);
+        System.out.println("XSLT: "+xsltString);
+        StringReader xml = new StringReader(xmlString);
+        StringReader xslt = new StringReader(xsltString);
+
                 Processor processor = new Processor(false);
                 Source xmlSource = new StreamSource(xml);
                 StringWriter output = new StringWriter();
@@ -126,17 +136,18 @@ public class App {
                 XsltExecutable stylesheet = compiler.compile(new StreamSource(xslt));
                 Serializer serializer = processor.newSerializer(output);
                 Xslt30Transformer transformer = stylesheet.load30();
-                Map<QName, XdmValue> stylesheetParameters = params.entrySet().stream()
+                if(params.size()>0) {
+                    Map<QName, XdmValue> stylesheetParameters = params.entrySet().stream()
                         .map(e -> new AbstractMap.SimpleEntry<QName, XdmValue>(
-                            new QName(e.getKey()), new XdmAtomicValue(e.getValue())))
+                                new QName(e.getKey()), new XdmAtomicValue(e.getValue())))
                         .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue));
-                //params.put(new QName("csv-uri"), );
-                transformer.setStylesheetParameters(stylesheetParameters);
+                                Map.Entry::getKey,
+                                Map.Entry::getValue));
+                    transformer.setStylesheetParameters(stylesheetParameters);
+                }
                 transformer.transform(xmlSource, serializer);
                 return output.toString();
-            }
-        }
+//            }
+//        }
     }
 }
