@@ -2,7 +2,7 @@
   <configuration default="false" name="App" type="Application" factoryName="Application" nameIsGenerated="true">
     <option name="MAIN_CLASS_NAME" value="curl.xml.App" />
     <module name="curl-xml.main" />
-    <option name="PROGRAM_PARAMETERS" value="-inTR=src/main/resources/xsl/csv2xml.xsl -X POST -H &quot;Content-Type: text/xml&quot; -H &quot;SOAPAction: blz:getBank&quot; &quot;http://www.thomas-bayer.com/axis2/services/BLZService&quot; -d @src/test/resources/request.xml" />
+    <option name="PROGRAM_PARAMETERS" value="-X POST -H &quot;Content-Type: text/xml&quot; -H &quot;SOAPAction: blz:getBank&quot; &quot;http://www.thomas-bayer.com/axis2/services/BLZService&quot; -d @src/test/resources/request.xml" />
     <extension name="coverage">
       <pattern>
         <option name="PATTERN" value="curl.xml.*" />

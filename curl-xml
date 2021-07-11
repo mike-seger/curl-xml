@@ -1,0 +1,3 @@
+#!/bin/bash
+
+java -jar build/libs/curl-xml-all*.jar -H "Content-Type: text/xml" "$@"

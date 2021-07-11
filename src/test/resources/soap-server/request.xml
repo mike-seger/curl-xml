@@ -1,0 +1,10 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                  xmlns:gs="http://net128.com/soap-server">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <gs:countryNameList>
+            <gs:name>Spain</gs:name>
+            <gs:name>Germany</gs:name>
+        </gs:countryNameList>
+    </soapenv:Body>
+</soapenv:Envelope>
