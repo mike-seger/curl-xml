@@ -16,19 +16,17 @@
 
 package com.example.producingwebservice;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import io.spring.guides.gs_producing_web_service.GetCountryRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import io.spring.guides.gs_producing_web_service.GetCountryRequest;
-
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.springframework.util.ClassUtils;
 import org.springframework.ws.client.core.WebServiceTemplate;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public class ProducingWebServiceApplicationIntegrationTests {
@@ -48,7 +46,7 @@ public class ProducingWebServiceApplicationIntegrationTests {
 	public void testSendAndReceive() {
 		WebServiceTemplate ws = new WebServiceTemplate(marshaller);
 		GetCountryRequest request = new GetCountryRequest();
-		request.setName("Spain");
+		request.getNameList().add("Germany");
 
 		assertThat(ws.marshalSendAndReceive("http://localhost:"
 				+ port + "/ws", request) != null);

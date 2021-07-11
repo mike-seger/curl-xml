@@ -4,14 +4,6 @@
     <xs:element name="getCountryRequest">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="name" type="xs:string"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:element name="getCountriesRequest">
-        <xs:complexType>
-            <xs:sequence>
                 <xs:element name="nameList" block="extension"
                             minOccurs="0" maxOccurs="unbounded" type="xs:string"/>
             </xs:sequence>
@@ -21,15 +13,7 @@
     <xs:element name="getCountryResponse">
         <xs:complexType>
             <xs:sequence>
-                <xs:element name="country" type="tns:country"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:element name="getCountriesResponse">
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="countriesList" block="extension" type="tns:country"
+                <xs:element name="countryList" type="tns:country" block="extension"
                             minOccurs="0" maxOccurs="unbounded"/>
             </xs:sequence>
         </xs:complexType>

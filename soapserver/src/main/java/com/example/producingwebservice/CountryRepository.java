@@ -1,16 +1,15 @@
 package com.example.producingwebservice;
 
-import javax.annotation.PostConstruct;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import io.spring.guides.gs_producing_web_service.Country;
 import io.spring.guides.gs_producing_web_service.Currency;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
+
+import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class CountryRepository {
@@ -41,6 +40,7 @@ public class CountryRepository {
 	}
 
 	public List<Country> findCountries(List<String> names) {
-		return countries.values().stream().filter(c -> names.contains(c.getName())).collect(Collectors.toList());
+		List<Country> result = names.stream().filter(countries::containsKey).map(countries::get).collect(Collectors.toList());
+		return result;
 	}
 }
