@@ -5,16 +5,16 @@
     <xsl:output indent="yes"/>
     <xsl:strip-space elements="*"/>
 
-    <xsl:template match="/" name="to-blz-request">
-        <soapenv:Envelope>
+    <xsl:template match="/" name="name-list-2-request">
+        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+                          xmlns:gs="http://net128.com/soap-server">
             <soapenv:Header/>
             <soapenv:Body>
-                <blz:getBank>
-                    <blz:blz>41670027</blz:blz>
-                </blz:getBank>
-                <blz:getBank>
-                    <blz:blz>10020200</blz:blz>
-                </blz:getBank>
+                <gs:countryNameList>
+                    <xsl:for-each select="data/row">
+                        <gs:name><xsl:value-of select="name"/></gs:name>
+                    </xsl:for-each>
+                </gs:countryNameList>
             </soapenv:Body>
         </soapenv:Envelope>
     </xsl:template>

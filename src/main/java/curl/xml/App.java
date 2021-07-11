@@ -1,7 +1,6 @@
 package curl.xml;
 
 import net.sf.saxon.s9api.*;
-import net.sf.saxon.value.AtomicValue;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 
@@ -9,7 +8,6 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
@@ -25,8 +23,12 @@ public class App {
         final List<String> inputTransformations=new ArrayList<>();
         final List<String> outputTransformations=new ArrayList<>();
         final AtomicBoolean inputCsv = new AtomicBoolean(false);
+        final AtomicBoolean hasHttp = new AtomicBoolean(false);
         final List<String> argList= Arrays.stream(args).filter(arg -> {
             arg = arg.trim();
+            if(!hasHttp.get()) {
+                hasHttp.set(arg.matches("https*://.*"));
+            }
             if(arg.length()==0) {
                 return false;
             } else if(arg.matches("-inTR=.*")) {
@@ -46,49 +48,58 @@ public class App {
             return "\""+arg.replaceAll("\"", "\\\"")+"\"";
         }).collect(Collectors.toList());
 
-        if(args.length==0) {
-            System.out.println("No curl arguments provided. See https://github.com/libetl/curl");
-            System.exit(1);
-        }
-
         String appArgs = String.join(" ", argList);
         try {
             final String fileArgMatcher = "-d  *[\"']*@([^\"']*)[\"']*";
-            String input = appArgs.replaceAll(".*"+fileArgMatcher+".*", "$1");
+            String input = appArgs.replaceAll(".*" + fileArgMatcher + ".*", "$1");
             String inputString;
-            if(System.in.available()>0) {
-                inputString=readInput(System.in).replace("'", "\\'");
+            if (System.in.available() > 0) {
+                inputString = readInput(System.in).replace("'", "\\'");
             } else {
                 final File inputFile = new File(input.trim());
-                if(!inputFile.exists())
+                if (!inputFile.exists())
                     throw new FileNotFoundException(inputFile.getAbsolutePath());
                 else
                     inputString = readInput(getResource(inputFile.toURI().toString())).replace("'", "\\'");
             }
 
-            if(inputCsv.get()) {
-                inputString = transform(string2InputStream("<root></root>"),
-                    getResource("classpath:/xsl/csv2xml.xsl"),
-                    Map.of("csv-data", inputString));
-                System.out.println(inputString);
-                for(String xsl : inputTransformations) {
-                    inputString = transform(string2InputStream(inputString), getResource(xsl));
-                    System.out.println(inputString);
-                }
+            System.out.printf("INPUT:\n%s\n\n", inputString.trim());
+            if (inputCsv.get()) {
+                String xsl = "classpath:/xsl/csv2xml.xsl";
+                inputString = transform(string2InputStream("<x/>"),
+                    getResource(xsl), Map.of("csv-data", inputString));
+                System.out.printf("CSV -> XML %s:\n%s\n", xsl, inputString);
             }
 
-            final String curlArgs = appArgs.replaceAll(fileArgMatcher, "")
-                .replaceAll("$", " -d '"+inputString+"'");
-            final HttpResponse response = curl(curlArgs);
-            final HttpEntity responseEntity = response.getEntity();
-            if (responseEntity != null) {
-                String result = transform(responseEntity.getContent(), getClass().getResourceAsStream("/xsl/strip-ns.xsl"));
-                for(String xsl : outputTransformations) {
+            for (String xsl : inputTransformations) {
+                inputString = transform(string2InputStream(inputString), getResource(xsl));
+                System.out.printf("Input TR %s ->:\n%s\n", xsl, inputString);
+            }
+
+            String result = inputString;
+            boolean callSucceeded = true;
+            if (hasHttp.get()) {
+                callSucceeded = false;
+                final String curlArgs =
+                    appArgs.replaceAll(fileArgMatcher, "")
+                    +" -d '" + inputString + "'";
+                final HttpResponse response = curl(curlArgs);
+                final HttpEntity responseEntity = response.getEntity();
+                if (responseEntity != null) {
+                    result = readInput(responseEntity.getContent());
+                    System.out.printf("CURL result:\n%s\n\n", result.trim());
+                    result = transform(string2InputStream(result), getClass().getResourceAsStream("/xsl/strip-ns.xsl"));
+//                    result = transform(string2InputStream(result), getClass().getResourceAsStream("/xsl/format.xsl"));
+                    callSucceeded = true;
+                }
+            }
+            if (callSucceeded) {
+                for (String xsl : outputTransformations) {
                     result = transform(string2InputStream(result), getResource(xsl));
-                    System.out.println(result);
+                    System.out.printf("Output TR %s ->:\n%s\n", xsl, result);
                 }
                 result = transform(string2InputStream(result), getClass().getResourceAsStream("/xsl/strip-ns.xsl"));
-                System.out.println(result);
+                System.out.printf("Final result:\n%s\n\n", result.trim());
             }
         } catch (Exception e) {
             System.out.println(appArgs);
@@ -114,9 +125,8 @@ public class App {
         }
     }
 
-    public String transform(InputStream xmlIn, InputStream xslIn, Map.Entry<String, String> ... params) throws IOException, SaxonApiException {
-        return  transform(xmlIn, xslIn, Arrays.stream(params).collect(Collectors.toMap(
-            Map.Entry::getKey, Map.Entry::getValue)));
+    public String transform(InputStream xmlIn, InputStream xslIn) throws IOException, SaxonApiException {
+        return  transform(xmlIn, xslIn, Collections.emptyMap());
     }
 
     public String transform(InputStream xmlIn, InputStream xslIn, Map<String, String> params) throws IOException, SaxonApiException {
@@ -130,12 +140,11 @@ public class App {
                 Serializer serializer = processor.newSerializer(output);
                 Xslt30Transformer transformer = stylesheet.load30();
                 Map<QName, XdmValue> stylesheetParameters = params.entrySet().stream()
-                        .map(e -> new AbstractMap.SimpleEntry<QName, XdmValue>(
-                            new QName(e.getKey()), new XdmAtomicValue(e.getValue())))
-                        .collect(Collectors.toMap(
-                            Map.Entry::getKey,
-                            Map.Entry::getValue));
-                //params.put(new QName("csv-uri"), );
+                    .map(e -> new AbstractMap.SimpleEntry<QName, XdmValue>(
+                        new QName(e.getKey()), new XdmAtomicValue(e.getValue())))
+                    .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue));
                 transformer.setStylesheetParameters(stylesheetParameters);
                 transformer.transform(xmlSource, serializer);
                 return output.toString();
