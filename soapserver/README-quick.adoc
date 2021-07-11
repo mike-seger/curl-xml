@@ -17,4 +17,25 @@ curl <<-EOF -fsSL -H "content-type: text/xml" -d @- http://localhost:8080/ws \
 </soapenv:Envelope>
 
 EOF
+# returns
+<?xml version="1.0"?>
+<SOAP-ENV:Envelope xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/">
+  <SOAP-ENV:Header/>
+  <SOAP-ENV:Body>
+    <ns2:countryList xmlns:ns2="http://spring.io/guides/gs-producing-web-service">
+      <ns2:country>
+        <ns2:name>Spain</ns2:name>
+        <ns2:population>46754778</ns2:population>
+        <ns2:capital>Madrid</ns2:capital>
+        <ns2:currency>EUR</ns2:currency>
+      </ns2:country>
+      <ns2:country>
+        <ns2:name>Germany</ns2:name>
+        <ns2:population>83783942</ns2:population>
+        <ns2:capital>Berlin</ns2:capital>
+        <ns2:currency>EUR</ns2:currency>
+      </ns2:country>
+    </ns2:countryList>
+  </SOAP-ENV:Body>
+</SOAP-ENV:Envelope>
 ----
