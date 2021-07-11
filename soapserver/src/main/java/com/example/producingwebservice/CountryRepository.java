@@ -34,7 +34,7 @@ public class CountryRepository {
 	}
 
 	public List<Country> findCountries(List<String> names) {
-		List<Country> result = names.stream().filter(countries::containsKey).map(countries::get).collect(Collectors.toList());
+		List<Country> result = names.stream()/*.filter(countries::containsKey)*/.map(countries::get).collect(Collectors.toList());
 		return result;
 	}
 }
