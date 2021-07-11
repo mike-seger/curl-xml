@@ -22,7 +22,7 @@ public class App {
     public void run(String[] args) {
         final List<String> inputTransformations=new ArrayList<>();
         final List<String> outputTransformations=new ArrayList<>();
-        final AtomicBoolean inputCsv = new AtomicBoolean(false);
+        final AtomicBoolean inputIsCsv = new AtomicBoolean(false);
         final AtomicBoolean hasHttp = new AtomicBoolean(false);
         final List<String> argList= Arrays.stream(args).filter(arg -> {
             arg = arg.trim();
@@ -38,7 +38,7 @@ public class App {
                 outputTransformations.add(arg.substring(arg.indexOf('=')+1));
                 return false;
             } else if(arg.equals("-inCSV")) {
-                inputCsv.set(true);
+                inputIsCsv.set(true);
                 return false;
             }
             return true;
@@ -51,7 +51,7 @@ public class App {
         String appArgs = String.join(" ", argList);
         try {
             final String fileArgMatcher = "-d  *[\"']*@([^\"']*)[\"']*";
-            String input = appArgs.replaceAll(".*" + fileArgMatcher + ".*", "$1");
+            final String input = appArgs.replaceAll(".*" + fileArgMatcher + ".*", "$1");
             String inputString;
             if (System.in.available() > 0) {
                 inputString = readInput(System.in).replace("'", "\\'");
@@ -64,14 +64,14 @@ public class App {
             }
 
             System.out.printf("INPUT:\n%s\n\n", inputString.trim());
-            if (inputCsv.get()) {
+            if (inputIsCsv.get()) {
                 String xsl = "classpath:/xsl/csv2xml.xsl";
                 inputString = transform(string2InputStream("<x/>"),
                     getResource(xsl), Map.of("csv-data", inputString));
                 System.out.printf("CSV -> XML %s:\n%s\n", xsl, inputString);
             }
 
-            for (String xsl : inputTransformations) {
+            for (final String xsl : inputTransformations) {
                 inputString = transform(string2InputStream(inputString), getResource(xsl));
                 System.out.printf("Input TR %s ->:\n%s\n", xsl, inputString);
             }
@@ -94,7 +94,7 @@ public class App {
                 }
             }
             if (callSucceeded) {
-                for (String xsl : outputTransformations) {
+                for (final String xsl : outputTransformations) {
                     result = transform(string2InputStream(result), getResource(xsl));
                     System.out.printf("Output TR %s ->:\n%s\n", xsl, result);
                 }
