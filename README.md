@@ -8,7 +8,8 @@
 ## Running
 ### soap-server (https://github.com/mike-seger/soap-server)
 ```
-./curl-xml "http://localhost:8080/ws"' <<<'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+./curl-xml "https://ms-soap-server.herokuapp.com/ws" \
+    <<<'<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
   xmlns:gs="http://net128.com/soap-server">
    <soapenv:Header/>
    <soapenv:Body>
