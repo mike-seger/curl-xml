@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Envelope>
+   <Header/>
+   <Body>
+      <countryNameList>
+         <name>Spain</name>
+         <name>France</name>
+      </countryNameList>
+   </Body>
+</Envelope>

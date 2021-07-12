@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Envelope>
+   <Header/>
+   <Body>
+      <countryList>
+         <country>
+            <name>Spain</name>
+            <population>46754778</population>
+            <capital>Madrid</capital>
+            <currency>EUR</currency>
+         </country>
+         <country>
+            <name>France</name>
+            <population>65273511</population>
+            <capital>Paris</capital>
+            <currency>EUR</currency>
+         </country>
+      </countryList>
+   </Body>
+</Envelope>

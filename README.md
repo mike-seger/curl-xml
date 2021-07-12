@@ -22,13 +22,12 @@
 </soapenv:Envelope>'
 
 # Request generated from CSV data file
-./curl-xml -inCSV -inTR=src/test/resources/soap-server/namelist-2-request.xsl \
+./curl-xml -inCSV -inTR=src/test/resources/soap-server/name-list-2-request.xsl \
     "https://ms-soap-server.herokuapp.com/ws" \
     <src/test/resources/soap-server/selected-countrty-names.csv
-```
 
 # Request generated from CSV data
-./curl-xml -inCSV -inTR=src/test/resources/soap-server/namelist-2-request.xsl \
+./curl-xml -inCSV -inTR=src/test/resources/soap-server/name-list-2-request.xsl \
 "https://ms-soap-server.herokuapp.com/ws" \
 <<<'name
 Spain
