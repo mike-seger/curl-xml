@@ -87,8 +87,9 @@ public class CurlXml implements IOAware {
                 curlArgs.add(quoteNonOption(inputString));
                 CUrl curl = new CUrl().opt(curlArgs.toArray(new String[0]));
                 result = curl.exec("UTF8");
+                debug(debug, String.format("CURL result:\n%s\n", result));
                 if(curl.getHttpCode()>=400) {
-                    throw new IllegalStateException("Curl call failed: "+curl.getHttpCode()+"\n"+result);
+                    throw new IllegalStateException("Curl call failed: "+curl.getHttpCode());
                 }
 
                 result = xslTransformer.transform(string2InputStream(result), getClass().getResourceAsStream("/xsl/strip-ns.xsl"));
