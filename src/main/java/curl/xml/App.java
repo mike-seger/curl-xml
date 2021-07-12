@@ -40,12 +40,11 @@ public class App implements IOAware {
             return true;
         }).map(arg -> {
             arg = arg.trim();
-            if(arg.matches("^[\"@\\-].*")) return arg;
-            return "\""+arg.replaceAll("\"", "\\\"")+"\"";
+            return arg;
         }).collect(Collectors.toList());
 
         String result = new CurlXml().call(
-            String.join(" ", argList), null,
+            argList, null,
             inputTransformations, outputTransformations,
                 debug.get(), inputIsCsv.get(), isRemoteCall.get());
         System.out.println(result);

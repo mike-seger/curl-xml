@@ -4,7 +4,9 @@ import net.sf.saxon.s9api.*;
 
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.util.AbstractMap;
 import java.util.Collections;
 import java.util.Map;
