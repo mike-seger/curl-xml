@@ -4,6 +4,7 @@
                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 exclude-result-prefixes="xsl xsd xsi">
     <xsl:output method="xml" indent="yes"/>
+    
     <!-- template to copy elements -->
     <xsl:template match="*">
         <xsl:element name="{local-name()}">
