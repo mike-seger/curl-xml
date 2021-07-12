@@ -9,7 +9,6 @@ repositories {
 
 dependencies {
     implementation 'com.google.guava:guava:29.0-jre'
-    implementation 'org.toile-libre.libe:curl:0.0.39'
     implementation 'com.github.rockswang:java-curl:1.2.2.2'
     implementation 'net.sf.saxon:Saxon-HE:10.5'
     implementation 'ch.qos.logback:logback-classic:1.2.3'

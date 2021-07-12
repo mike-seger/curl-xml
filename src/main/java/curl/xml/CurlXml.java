@@ -1,8 +1,6 @@
 package curl.xml;
 
 import com.roxstudio.utils.CUrl;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +9,6 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static org.toilelibre.libe.curl.Curl.curl;
 
 public class CurlXml implements IOAware {
     private static final Logger logger = LoggerFactory.getLogger(CurlXml.class);
@@ -90,19 +85,6 @@ public class CurlXml implements IOAware {
                 argList.stream().map(this::quoteNonOption).forEach(curlArgs::add);
                 curlArgs.add("-d");
                 curlArgs.add(quoteNonOption(inputString));
-//                    argList.stream().map(this::quoteNonOption)
-//                        .collect(Collectors.joining(" "))
-//                        +" -d" + quoteNonOption(inputString);
-
-//                final HttpResponse response = curl(String.join(" ", curlArgs));
-//                final HttpEntity responseEntity = response.getEntity();
-//                if (responseEntity != null) {
-//                    result = readInput(responseEntity.getContent());
-//                    debug(debug, String.format("CURL result:\n%s\n\n", result.trim()));
-//                } else {
-//                    throw new IllegalStateException("Curl call failed");
-//                }
-
                 CUrl curl = new CUrl().opt(curlArgs.toArray(new String[0]));
                 result = curl.exec("UTF8");
                 if(curl.getHttpCode()>=400) {
