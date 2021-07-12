@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-public class AppTest implements TestAware {
+public class CurlXmlTest implements TestAware {
     @Test
     public void testSoapServer() throws IOException {
         String result = new CurlXml().call(
